@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Breed Prediction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Dog Breed Predictor</a>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="jumbotron">
+            <h1 class="display-4">Welcome to Dog Breed Predictor!</h1>
+            <p class="lead">This AI tool can identify the breed of a dog from a photo. Give it a try!</p>
+            <hr class="my-4">
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" name="file" class="form-control-file">
+                    <button type="submit" class="btn btn-primary btn-lg mt-2">Upload and Predict</button>
+                </div>
+            </form>
+        </div>
+
+        {% if predicted_breed %}
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">Prediction Result:</h4>
+                <p>The AI predicts the dog breed as <strong>{{ predicted_breed }}</strong>.</p>
+            </div>
+        {% endif %}
+    </div>
+	
+<!-- Existing code -->
+
+<div class="container mt-4">
+    <h2>Use Cases</h2>
+
+    <!-- Use Case 1 -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Lost and Found Dogs</h5>
+            <p class="card-text">...</p>
+            <a href="{{ url_for('lost_and_found') }}" class="btn btn-primary">Learn More</a>
+        </div>
+    </div>
+
+    <!-- Use Case 2 -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Dog Breed Education</h5>
+            <p class="card-text">...</p>
+            <a href="{{ url_for('breed_education') }}" class="btn btn-primary">Explore Breeds</a>
+        </div>
+    </div>
+</div>
+
+
+    <footer class="bg-dark text-light text-center py-3 mt-4">
+        &copy; 2023 Dog Breed Predictor. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

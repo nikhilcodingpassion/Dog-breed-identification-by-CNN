@@ -1,0 +1,17 @@
+<!-- breed_education.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Breed Education</h1>
+<div class="breed-education-container">
+    {% for breed in breeds_info %}
+    <div class="breed-info-card">
+        <h1>Breed Education</h1>
+        <h2>{{ breed.breed }}</h2>
+        <!-- Update the path according to your static images folder structure -->
+        <img src="{{ url_for('static', filename='images/' + breed.image_file) }}" alt="{{ breed.breed }}">
+        <!-- Add any other breed info you'd like to display here -->
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

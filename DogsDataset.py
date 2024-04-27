@@ -1,70 +1,45 @@
-import torchvision
-from torchvision import datasets, models, transforms
-from torch.utils.data import Dataset, DataLoader
-import numpy as np
+import torch
 import pandas as pd
-import os
-from skimage import io, transform
 from PIL import Image
+from torchvision import transforms
+from torch.utils.data import Dataset
+import os
+import numpy as np
+
 
 class DogsDataset(Dataset):
+    def __init__(self, csv_file='', root_dir="/", transform=None, mode='train'):
+        self.mode = mode
+        self.labels = self.parseData(csv_file)
+        self.root_dir = root_dir
+        self.transform = transform
 
-	def __init__(self, csv_file='', root_dir="/", transform=None, mode='train'):
-		"""
-		Args:
-			csv_file (string): Path to the csv file with annotations.
-			root_dir (string): Directory with all the images.
-			transform (callable, optional): Optional transform to be applied
-				on a sample.
-		"""
-		self.NUM_CLASSES = 120
-		self.mode = mode
-		
-		self.labels = self.parseData(csv_file)
-		self.root_dir = root_dir
-		self.transform = transform
+    def parseData(self, file_path):
+        data = pd.read_csv(file_path)
+        if self.mode == 'train':
+            # Assuming the training data still has a 'breed' column
+            breed_to_label = {breed: idx for idx, breed in enumerate(data['breed'].unique())}
+            data['label'] = data['breed'].map(breed_to_label)
+        else:
+            # For test data, we don't have a 'breed' column
+            # Just use the 'id' column
+            data['label'] = 0  # Dummy label for test data
+        return data
 
-		
-		
+    def __len__(self):
+        return len(self.labels)
 
-	def parseData(self, file_path):
-		data = pd.read_csv(file_path)
-		#selected_breed_list = list(data.groupby('breed').count().sort_values(by='id', ascending=False).head(self.NUM_CLASSES).index)
-		#data = data[data['breed'].isin(selected_breed_list)]
-		data['target'] = 1
-		#data['rank'] = data.groupby('breed').rank()['id']
-		if self.mode is 'train':
-			data_pivot = data.pivot('id', 'breed', 'target').reset_index().fillna(0)
-		else:
-			data_pivot = data.pivot('id','target').reset_index().fillna(0)
-		#data_pivot = data.pivot('id', 'breed').reset_index().fillna(0)
-		#print(data_pivot['breed'].unique())
-		
-		
-		
-		return data_pivot
+    def __getitem__(self, idx):
+        img_name = os.path.join(self.root_dir, self.labels.iloc[idx, 0] + '.jpg')
+        image = Image.open(img_name)
 
-	def __len__(self):
-		return len(self.labels)
-	
-	def __getitem__(self, idx):
-		img_name = os.path.join(self.root_dir,
-								self.labels.iloc[idx, 0]+'.jpg')
-		image = Image.open(img_name)
-		
-		if self.mode is 'train':
-			labels = self.labels.iloc[idx, 1:].as_matrix().astype('float32')
-			label = np.argmax(labels)
-		else:
-			label = self.labels.iloc[idx, 0]
-			
-		if self.transform:
-			image = self.transform(image)
-		sample = (image,label)
-#		sample = (image, labels)
+        if self.mode == 'train':
+            label = self.labels.iloc[idx]['label']
+        else:
+            # Use the filename (or a part of it) as the 'label' for test images
+            label = self.labels.iloc[idx, 0]
 
-		return sample
-		
-		
-	
-		
+        if self.transform:
+            image = self.transform(image)
+
+        return image, label
